@@ -1,20 +1,9 @@
 #!/bin/bash
 #A script to record time worked.
 
+TIME_FILE=/home/kbladow/staq/timefile.txt
 
-
-TIME_FILE=timefile.txt
-
-#Enter time you started working.
-if [ $1 = 'in' ]; then
-  echo -e "In:     $(date +'%Y-%m-%d %T')">>$TIME_FILE
-
-#Enter time you finished working.
-elif [ $1 = 'out' ]; then
-  echo -e "Out:    $(date +'%Y-%m-%d %T')">>$TIME_FILE
-
-#Add up the time you spent working.
-elif [ $1 = 'tally' ]; then
+function tally {
   filecontent=( `cat $TIME_FILE` )
 
   i=0
@@ -43,22 +32,23 @@ elif [ $1 = 'tally' ]; then
     ((difference[t]=(out_times[t]-in_times[t])))
   done
 
-  i=0
-
   #Combine entries from the same date.
   for t in "${!dates[@]}"
   do
-    ((i=t+1))
-    if [ $i -le ${#dates[@]} ]; then
-      if [ "${dates[$i]}" == "${dates[$t]}" ]; then
-        ((difference[$t]=difference[$t]+difference[$i]))
-        unset difference[$i]
-        unset dates[$i]
+    for i in "${!dates[@]}"
+    do
+      ((i=t+i+1))
+      if [ $i -ne $t ] && [ $i -le ${#dates[@]} ]; then
+        if [ "${dates[$i]}" == "${dates[$t]}" ]; then
+          ((difference[$t]=difference[$t]+difference[$i]))
+          unset difference[$i]
+          unset dates[$i]
+        fi
       fi
-    fi
+    done
   done
 
-  #print out the totals for the days.
+  #Print out the totals for the days.
   for t in "${!difference[@]}"
   do
     ((hours=${difference[$t]}/3600))
@@ -80,4 +70,21 @@ elif [ $1 = 'tally' ]; then
   ((minutes=(total-(hours*3600))/60))
   ((seconds=total-(hours*3600)-(minutes*60)))
   echo "You worked a total of $hours hours, $minutes minutes, and $seconds seconds."
+}
+
+#Enter time you started working.
+if [ $1 = 'in' ]; then
+  echo -e "In:     $(date +'%Y-%m-%d %T')">>$TIME_FILE
+
+#Enter time you finished working.
+elif [ $1 = 'out' ]; then
+  echo -e "Out:    $(date +'%Y-%m-%d %T')">>$TIME_FILE
+  tally
+
+#Add up the time you spent working.
+elif [ $1 = 'tally' ]; then
+  tally
+
 fi
+
+
