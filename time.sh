@@ -14,55 +14,57 @@ function tally {
   dates=(0)
 
   #Create lists of dates and times.
-  for t in "${!filecontent[@]}"
+  for a in "${!filecontent[@]}"
   do
-    if [ ${filecontent[$t]} == 'In:' ]; then
-      in_times[$i]=$(date -d "${filecontent[$t+1]} ${filecontent[$t+2]}" -u +%s)
-      dates[$i]=$(date -d "${filecontent[$t+1]} ${filecontent[$t+2]}" +"%Y-%m-%d")
+    if [ ${filecontent[$a]} == 'In:' ]; then
+      in_times[$i]=$(date -d "${filecontent[$a+1]} ${filecontent[$a+2]}" -u +%s)
+      dates[$i]=$(date -d "${filecontent[$a+1]} ${filecontent[$a+2]}" +"%Y-%m-%d")
       ((i=i+1))
-    elif [ ${filecontent[$t]} == 'Out:' ]; then
-      out_times[$j]=$(date -d "${filecontent[$t+1]} ${filecontent[$t+2]}" -u +%s)
+    elif [ ${filecontent[$a]} == 'Out:' ]; then
+      out_times[$j]=$(date -d "${filecontent[$a+1]} ${filecontent[$a+2]}" -u +%s)
       ((j=j+1))
     fi
   done
 
   #Find the amount of time worked.
-  for t in "${!in_times[@]}"
+  for b in "${!in_times[@]}"
   do
-    ((difference[t]=(out_times[t]-in_times[t])))
+    ((difference[b]=(out_times[b]-in_times[b])))
   done
 
+
+
   #Combine entries from the same date.
-  for t in "${!dates[@]}"
+  for c in "${!dates[@]}"
   do
-    for i in "${!dates[@]}"
+    for d in "${!dates[@]}"
     do
-      ((i=t+i+1))
-      if [ $i -ne $t ] && [ $i -le ${#dates[@]} ]; then
-        if [ "${dates[$i]}" == "${dates[$t]}" ]; then
-          ((difference[$t]=difference[$t]+difference[$i]))
-          unset difference[$i]
-          unset dates[$i]
+      ((d=c+d+1))
+      if [ $d -ne $c ] && [ $d -le ${#dates[@]} ] && [[ ${#dates[$c]} -ne "" ]]; then
+        if [ "${dates[$d]}" == "${dates[$c]}" ]; then
+          ((difference[$c]=difference[$c]+difference[$d]))
+          unset difference[$d]
+          unset dates[$d]
         fi
       fi
     done
   done
 
   #Print out the totals for the days.
-  for t in "${!difference[@]}"
+  for e in "${!difference[@]}"
   do
-    ((hours=${difference[$t]}/3600))
-    ((minutes=(${difference[$t]}-(hours*3600))/60))
-    ((seconds=${difference[$t]}-(hours*3600)-(minutes*60)))
-    echo "On ${dates[$t]}, you worked $hours hours, $minutes minutes, $seconds seconds."
+    ((hours=${difference[$e]}/3600))
+    ((minutes=(${difference[$e]}-(hours*3600))/60))
+    ((seconds=${difference[$e]}-(hours*3600)-(minutes*60)))
+    echo "On ${dates[$e]}, you worked $hours hours, $minutes minutes, $seconds seconds."
   done
 
   #Calculate the total for all logged entries.
   total=0
 
-  for t in "${!difference[@]}"
+  for f in "${!difference[@]}"
   do
-    ((total=total + difference[$t]))
+    ((total=total + difference[$f]))
   done
 
   #Print out the total for all logged entries.
