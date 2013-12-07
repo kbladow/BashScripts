@@ -32,19 +32,19 @@ function tally {
     ((difference[b]=(out_times[b]-in_times[b])))
   done
 
-
+  size=${#dates[@]}
 
   #Combine entries from the same date.
   for c in "${!dates[@]}"
   do
     for d in "${!dates[@]}"
     do
-      ((d=c+d+1))
-      if [ $d -ne $c ] && [ $d -le ${#dates[@]} ] && [[ ${#dates[$c]} -ne "" ]]; then
-        if [ "${dates[$d]}" == "${dates[$c]}" ]; then
-          ((difference[$c]=difference[$c]+difference[$d]))
-          unset difference[$d]
-          unset dates[$d]
+      ((z=c+d+1))
+      if [ $z -ne $c ] && [ $z -lt $size ] && [[ ${#dates[$c]} -ne "" ]]; then
+        if [ "${dates[$z]}" == "${dates[$c]}" ]; then
+          ((difference[$c]=difference[$c]+difference[$z]))
+          unset difference[$z]
+          unset dates[$z]
         fi
       fi
     done
