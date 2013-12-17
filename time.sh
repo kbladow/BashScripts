@@ -33,13 +33,13 @@ function tally {
   done
 
   size=${#dates[@]}
-
   #Combine entries from the same date.
   for c in "${!dates[@]}"
   do
+    z=$c
     for d in "${!dates[@]}"
     do
-      ((z=c+d+1))
+      ((z=z+1))
       if [ $z -ne $c ] && [ $z -lt $size ] && [[ ${#dates[$c]} -ne "" ]]; then
         if [ "${dates[$z]}" == "${dates[$c]}" ]; then
           ((difference[$c]=difference[$c]+difference[$z]))
